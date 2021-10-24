@@ -1,4 +1,4 @@
-import errorImages from '../../images/wetrytofindwhatyouwant.png';
+import errorImages from '../../images/mastersearch.png';
 import s from './Skeleton.module.css';
 
 export default function Skeleton() {

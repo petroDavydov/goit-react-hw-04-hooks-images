@@ -1,6 +1,6 @@
 import s from './ImageGalleryItem.module.css';
 import PropTypes from 'prop-types';
-import defaultImage from '../../images/wetrytofindwhatyouwant.jpg';
+import defaultImage from '../../images/mastersearch.png';
 
 function ImageGalleryItem({
   onModal,
