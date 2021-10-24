@@ -25,7 +25,6 @@ import useToggleBtn from "../../hooks/useToggleBtn";
 // -----------------------------------------
 import ButtonScrollUp from "../ButtonScrollUp/ButtonScrollUp";
 // -----------------------------------------
-// import "./App.module.css";
 
 const App = () => {
   const [page, setPage] = useState(1);
@@ -65,12 +64,6 @@ const App = () => {
     setPage(page);
     setImagesPbay([]);
   };
-
-  //   toggleModal = () => {
-  //     this.setState(({ showModal }) => ({
-  //       showModal: !showModal,
-  //     }));
-  //   };
 
   const clickImages = (largeImage) => {
     setLargeImage(largeImage);
