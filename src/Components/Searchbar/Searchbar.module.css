@@ -4,6 +4,7 @@
 .Searchbar {
   top: 0;
   left: 0;
+  margin-bottom: 30px;
   position: sticky;
   z-index: 1100;
   display: flex;

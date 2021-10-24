@@ -1,128 +1,108 @@
-import { React, Component } from 'react';
+import { useState, useEffect } from "react";
 // -----------------------------------------
-import Container from '../Container/Container';
+import Container from "../Container/Container";
 // -----------------------------------------
-import LoaderTriangle from '../Loader/Loader';
+import LoaderTriangle from "../Loader/Loader";
 // -----------------------------------------
-import scrollToTarget from '../utils/Scroll/Scroll';
+import scrollToTarget from "../utils/Scroll/Scroll";
 // -----------------------------------------
-import Button from '../Button/Button';
+import Button from "../Button/Button";
 // -----------------------------------------
-import Searchbar from '../Searchbar/Searchbar';
+import Searchbar from "../Searchbar/Searchbar";
 // -----------------------------------------
-import ImageGallery from '../ImageGallery/ImageGallery';
+import ImageGallery from "../ImageGallery/ImageGallery";
 // -----------------------------------------
-import fetchImage from '../../Services/searchPicturesAPI';
+import fetchImageAPI from "../../Services/searchPicturesAPI";
 // -----------------------------------------
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // -----------------------------------------
-import Modal from '../Modal';
+import Modal from "../Modal";
 // -----------------------------------------
-import Skeleton from '../Skeleton/Skeleton';
+import Skeleton from "../Skeleton/Skeleton";
+// -----------------------------------------
+import useToggleBtn from "../../hooks/useToggleBtn";
+// -----------------------------------------
+import ButtonScrollUp from "../ButtonScrollUp/ButtonScrollUp";
 // -----------------------------------------
 // import "./App.module.css";
-// -----------------------------------------
-// -----------------------------------------
 
-class App extends Component {
-  state = {
-    page: 1,
-    searchQuery: '',
-    showModal: false,
-    loadingSpinner: false,
-    pixabayImages: [],
-    largeImages: {},
+const App = () => {
+  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showModal, setShowModal] = useToggleBtn(false);
+  const [loadingSpinner, setLoadingSpiner] = useState(false);
+  const [imagesPbay, setImagesPbay] = useState([]);
+  const [largeImage, setLargeImage] = useState({});
+
+  useEffect(() => {
+    if (!searchQuery) return;
+    setLoadingSpiner(true);
+    const fetchImagePbay = async () => {
+      try {
+        const hits = await fetchImageAPI(searchQuery, page);
+        setImagesPbay((imagesPbay) => [...imagesPbay, ...hits]);
+        if (page !== 1) {
+          scrollToTarget();
+        }
+      } catch (error) {
+        console.log(error.message);
+      } finally {
+        setLoadingSpiner(false);
+      }
+    };
+    fetchImagePbay();
+  }, [page, searchQuery]);
+
+  const handleLoadMoreClick = () => {
+    setLoadingSpiner(!loadingSpinner);
+    setPage((prevPage) => prevPage + 1);
+    setLoadingSpiner(loadingSpinner);
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    const { searchQuery } = this.state;
-    if (searchQuery !== prevState.searchQuery) {
-      this.fetchImagePbay()
-        .catch(error => console.log(error))
-        .finally(() => this.setState({ loadingSpinner: false }));
-    }
-  }
-
-  fetchImagePbay = () => {
-    const { searchQuery, page } = this.state;
-    this.setState({ loadingSpinner: true });
-    return fetchImage(searchQuery, page).then(pixabayImages => {
-      this.setState(prevState => ({
-        pixabayImages: [...prevState.pixabayImages, ...pixabayImages],
-        page: prevState.page + 1,
-      }));
-    });
+  const handleFormSubmit = (searchQuery) => {
+    setSearchQuery(searchQuery);
+    setPage(page);
+    setImagesPbay([]);
   };
 
-  handleLoadMoreClick = () => {
-    this.setState({ loadingSpinner: true });
-    this.fetchImagePbay()
-      .then(() => {
-        scrollToTarget();
-      })
-      .catch(error => console.log(error))
-      .finally(() => this.setState({ loadingSpinner: false }));
+  //   toggleModal = () => {
+  //     this.setState(({ showModal }) => ({
+  //       showModal: !showModal,
+  //     }));
+  //   };
+
+  const clickImages = (largeImage) => {
+    setLargeImage(largeImage);
+    setShowModal();
   };
 
-  handleFormSubmit = searchQuery => {
-    this.setState({
-      searchQuery,
-      page: 1,
-      pixabayImages: [],
-    });
-  };
+  return (
+    <>
+      <ToastContainer />
+      <Searchbar onSubmit={handleFormSubmit} />
+      <Container>
+        {imagesPbay.length !== 0 ? (
+          <ImageGallery onModal={clickImages} imagesPbay={imagesPbay} />
+        ) : (
+          searchQuery !== "" && <Skeleton />
+        )}
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
-  };
+        {loadingSpinner && <LoaderTriangle />}
 
-  ClickImages = largeImage => {
-    this.setState({ largeImage });
-    this.toggleModal();
-  };
+        {imagesPbay.length !== 0 && <Button onClick={handleLoadMoreClick} />}
 
-  render() {
-    const {
-      showModal,
-      searchQuery,
-      pixabayImages,
-      loadingSpinner,
-      largeImage,
-    } = this.state;
+        {imagesPbay.length > 14 && <ButtonScrollUp />}
 
-    const { toggleModal, handleFormSubmit, ClickImages, handleLoadMoreClick } =
-      this;
-
-    return (
-      <>
-        <ToastContainer />
-        <Searchbar onSubmit={handleFormSubmit} />
-        <Container>
-          {pixabayImages.length !== 0 ? (
-            <ImageGallery onModal={ClickImages} pixabayImages={pixabayImages} />
-          ) : (
-            searchQuery !== '' && <Skeleton />
-          )}
-
-          {loadingSpinner && <LoaderTriangle />}
-
-          {pixabayImages.length !== 0 && (
-            <Button onClick={handleLoadMoreClick} />
-          )}
-
-          {showModal && (
-            <Modal onModal={toggleModal}>
-              {loadingSpinner && <LoaderTriangle />}
-              <img src={largeImage.largeImageURL} alt={largeImage.tags} />
-            </Modal>
-          )}
-        </Container>
-      </>
-    );
-  }
-}
+        {showModal && (
+          <Modal onModal={setShowModal}>
+            {loadingSpinner && <LoaderTriangle />}
+            <img src={largeImage.largeImageURL} alt={largeImage.tags} />
+          </Modal>
+        )}
+      </Container>
+    </>
+  );
+};
 
 export default App;

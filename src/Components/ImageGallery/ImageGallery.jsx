@@ -3,11 +3,11 @@ import s from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import PropTypes from 'prop-types';
 
-function ImageGallery({ pixabayImages, onModal }) {
+function ImageGallery({ imagesPbay, onModal }) {
   return (
     <>
       <ul className={s.ImageGallery}>
-        {pixabayImages.map(image => (
+        {imagesPbay.map(image => (
           <ImageGalleryItem
             key={image.id}
             tags={image.tags}
@@ -23,7 +23,7 @@ function ImageGallery({ pixabayImages, onModal }) {
 
 ImageGallery.propTypes = {
   onModal: PropTypes.func.isRequired,
-  pixabayImages: PropTypes.arrayOf(
+  imagesPbay: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       tags: PropTypes.string.isRequired,
