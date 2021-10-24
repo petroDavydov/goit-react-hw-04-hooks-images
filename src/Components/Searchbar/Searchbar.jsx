@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import s from "./Searchbar.module.css";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
-import { useState } from "react/cjs/react.development";
 
 const Searchbar = ({ onSubmit }) => {
   const [searchQuery, setSearchQuery] = useState("");
