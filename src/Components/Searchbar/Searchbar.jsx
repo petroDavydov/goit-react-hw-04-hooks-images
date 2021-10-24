@@ -11,7 +11,9 @@ const Searchbar = ({ onSubmit }) => {
     e.preventDefault();
 
     if (searchQuery.trim() === "") {
-      return toast("Enter the name of the picture, please");
+      return toast.info("👀 Enter correct query, please", {
+        theme: "dark",
+      });
     }
 
     onSubmit(searchQuery);
