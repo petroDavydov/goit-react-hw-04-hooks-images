@@ -61,7 +61,7 @@ const App = () => {
 
   const handleFormSubmit = (searchQuery) => {
     setSearchQuery(searchQuery);
-    setPage(page);
+    setPage(1);
     setImagesPbay([]);
   };
 
